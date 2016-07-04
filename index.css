@@ -1,0 +1,41 @@
+#leftThing {
+    float: left;
+    width: 10%;
+}
+
+#scoreKeep {
+    font-weight: bold;
+}
+
+#rightThing {
+    width: 90%;
+    float: left;
+}
+
+#gameBorder {
+    border: 2px solid black;
+    display: none;
+    z-index: 1;
+}
+
+#gameOverPopup {
+    position: absolute;
+    border: 2px solid black;
+    z-index: 2;
+    
+    width: 50px;
+    height: 50px;
+}
+
+div.row {
+    padding-right: 1px;
+    height: 21px;
+}
+
+div.box {
+    margin-left: 1px;
+    float: left;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+}
