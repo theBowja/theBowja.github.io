@@ -10,7 +10,7 @@ var interval;
 
 var speedMultiplier = 1;
 var width = 50; //across
-var length = 30; //down
+var height = 30; //down
 var scoreTrail;
 
 var score = 0;
@@ -33,17 +33,17 @@ $(document).ready(function(){
 function initialize() {
     speedMultiplier = $("#selectSpeed").val();
     width = $("#inputWidth").val();
-    length = $("#inputLength").val();
+    height = $("#inputHeight").val();
     //scoreTrail = $("#checkboxScore").prop("checked");
     
-    if( width * length > 8192) {
+    if( width * height > 8192) {
         alert("Size too big");
         return;
     }
 
     $("#selectSpeed").prop("disabled", true);
     $("#inputWidth").prop("readonly", true);
-    $("#inputLength").prop("readonly", true);
+    $("#inputHeight").prop("readonly", true);
     //$("#checkboxScore").prop("disabled", true);
     
     $("#buttStart").hide();
@@ -56,7 +56,7 @@ function initialize() {
     directionQueue = ["RIGHT"];
     
     //makes rows
-    for( var i = 1; i <= length; i++) {
+    for( var i = 1; i <= height; i++) {
         $("#gameBorder").append("<div class='row' id='d"+i+"'></div>");
             
         //makes boxes inside rows
@@ -69,7 +69,7 @@ function initialize() {
         
     //Spawns the red snake
     for( var i = 0; i < initialSnakeLength; i++) {
-        snakeList.push( {across:i + 1, down:(length / 2)|0});
+        snakeList.push( {across:i + 1, down:(height / 2)|0});
         $("#d"+snakeList[i].down + "a"+snakeList[i].across).css("background-color", "red");
     }
         
@@ -79,7 +79,7 @@ function initialize() {
 }
 
 function getRandCoord() {
-    return {across:Math.floor(Math.random() * width) + 1, down:Math.floor(Math.random() * length) + 1};
+    return {across:Math.floor(Math.random() * width) + 1, down:Math.floor(Math.random() * height) + 1};
 }
 
 function spawnApple() {
@@ -111,7 +111,7 @@ function getBoxColor( coord) {
 }
 
 function getCollision( head) {
-    if( head.down < 1 || head.down > length || head.across < 1 || head.across > width) {
+    if( head.down < 1 || head.down > height || head.across < 1 || head.across > width) {
         return "border";
     }
 
@@ -136,7 +136,7 @@ function updateScore() {
     if( $("#checkboxScore").prop("checked")) {
         $("#d"+apple.down + "a"+apple.across).text( score);
     }
-    //$("#d"+(length / 2)|0 + "a"+(width / 2)|0).text(score);
+    //$("#d"+(height / 2)|0 + "a"+(width / 2)|0).text(score);
     //$("#d10a10").text(score);
 }
 
@@ -186,7 +186,7 @@ function gameOver() {
     game = false;
     $("#selectSpeed").prop("disabled", false);
     $("#inputWidth").prop("readonly", false);
-    $("#inputLength").prop("readonly", false);
+    $("#inputHeight").prop("readonly", false);
     
     //$("#checkboxScore").prop("disabled", false);
     
@@ -243,7 +243,7 @@ document.onkeydown = function(e){
             <option value=4>x4.0</option>        
         </select><br/>
         Width: <input id="inputWidth" type="number" value=50 min=30 max=60><br/>
-        Length: <input id="inputLength" type="number" value=30 min=20 max=50><br/>
+        Height: <input id="inputHeight" type="number" value=30 min=20 max=50><br/>
         <input id="checkboxScore" type="checkbox" checked="checked">Toggle score trail<br/>
     
         <br/><br/><br/>    
