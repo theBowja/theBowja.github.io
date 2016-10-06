@@ -1,0 +1,12 @@
+code {
+	word-wrap: normal;
+	display: block;
+
+	width: auto;
+	margin-top: 1em;
+	margin-bottom: 1em;
+	padding: 5px;
+
+	background-color: #eff0f1;
+	color: #393318;
+}
