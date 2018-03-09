@@ -12,5 +12,6 @@ code {
 }
 
 .bunny {
-	font: "Courier New";
+	font-family: monospace;
+	white-space: pre;
 }
