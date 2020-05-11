@@ -68,7 +68,7 @@ function initialize() {
     $("#d1").css("padding-top", "1px");
 
     //Spawns the red snake
-    for( var i = 0; i < initialSnakeLength; i++) {
+    for( let i = 0; i < initialSnakeLength; i++) {
         snakeList.push( {across:i + 1, down:(height / 2)|0});
         $("#d"+snakeList[i].down + "a"+snakeList[i].across).css("background-color", "red");
     }
@@ -116,7 +116,7 @@ function getCollision( head) {
     }
 
     else if( getBoxColor( head) == "red") {
-        return "snake"
+        return "snake";
     }
     
     else if( head.down == apple.down && head.across == apple.across) {
@@ -201,19 +201,19 @@ document.onkeydown = function(e){
         
         var lastEle = directionQueue[directionQueue.length - 1];
 
-        if( e.keyCode == 37 && lastEle != "RIGHT" && lastEle != "LEFT") {
+        if( (e.keyCode == 37 || e.keyCode == 65) && lastEle != "RIGHT" && lastEle != "LEFT") {
             directionQueue.push( "LEFT");
         }
 
-        else if( e.keyCode == 38 && lastEle != "DOWN" && lastEle != "UP") {
+        else if( (e.keyCode == 38 || e.keyCode == 87) && lastEle != "DOWN" && lastEle != "UP") {
             directionQueue.push( "UP");
         }
 
-        else if( e.keyCode == 39 && lastEle != "LEFT" && lastEle != "RIGHT") {
+        else if( (e.keyCode == 39 || e.keyCode == 68) && lastEle != "LEFT" && lastEle != "RIGHT") {
             directionQueue.push( "RIGHT");
         }
 
-        else if( e.keyCode == 40 && lastEle != "UP" && lastEle != "DOWN") {
+        else if( (e.keyCode == 40 || e.keyCode == 83) && lastEle != "UP" && lastEle != "DOWN") {
             directionQueue.push( "DOWN");
         }
     }
@@ -243,7 +243,7 @@ document.onkeydown = function(e){
         <option value=4>x4.0</option>        
     </select><br/>
     Width: <input id="inputWidth" type="number" value=50 min=30 max=60><br/>
-    Height: <input id="inputHeight" type="number" value=30 min=20 max=50><br/>
+    Height: <input id="inputHeight" type="number" value=28 min=20 max=50><br/>
     <input id="checkboxScore" type="checkbox" checked="checked">Toggle score trail<br/>
     
     <br/><br/><br/>    
