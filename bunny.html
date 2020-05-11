@@ -6,7 +6,21 @@
     <script src="libraries/jquery-1.9.1.min.js"></script>
     <script>
         $(function() {
-            console.log($(".animation__frame"));
+            var frames = $(".animation__frame");
+            var len = frames.length;
+            var ind = $(".animation__frame--visible").index();
+            var fskip = false; // frame has been skipped. for pausing briefly at end of animation
+            
+            setInterval(function() {
+                if(ind%len == frames.length-1 && !fskip) {
+                    fskip = true;
+                } else {
+                    fskip = false;
+                    frames.eq(ind%len).toggleClass("animation__frame--visible", false);
+                    ind++;
+                    frames.eq(ind%len).toggleClass("animation__frame--visible", true);
+                }
+            }, 150);
         });
     </script>
 </head>
