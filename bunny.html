@@ -12,7 +12,7 @@
             var fskip = false; // frame has been skipped. for pausing briefly at end of animation
             
             setInterval(function() {
-                if(ind%len == frames.length-1 && !fskip) {
+                if(ind%len == 0 && !fskip) {
                     fskip = true;
                 } else {
                     fskip = false;
