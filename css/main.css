@@ -15,3 +15,11 @@ code {
 	font-family: monospace;
 	white-space: pre;
 }
+
+.animation__frame {
+	display: none;
+}
+
+.animation__frame--visible {
+	display: block;
+}
