@@ -1,23 +1,17 @@
-<!doctype html>
-<html>
-<head>
-    <title>Snake</title>
-    <link rel="icon" type="image/png" href="img/favicon/snek16.png">
-    <link rel="stylesheet" type="text/css" href="css/snake.css">
-    <script src="libraries/jquery-1.9.1.min.js"></script>
-    <script>
-        var game = false;
-        var interval;
+var game = false;
+var interval;
 
-        var speedMultiplier = 1;
-var width = 50; //across
-var height = 30; //down
+var speedMultiplier = 1;
+var width = 0; //across
+var height = 0; //down
 var scoreTrail;
 
 var score = 0;
 var apple;
 var snakeList = [];
 var directionQueue = ["RIGHT"];
+
+var heatmapMax = 0;
 
 var initialSnakeLength =  3;
 
@@ -29,6 +23,28 @@ $(document).ready(function(){
 
         return false;
     });
+    $("#checkboxHeatmap").click(function() {
+        if(game) return;
+    	if($(this).prop("checked")) {
+		    for(let i = 1; i <= height; i++) {
+		        for(let j = 1; j <= width; j++) {
+		        	let tile = $("#d"+i + "a"+j);
+                    let hmnum = tile.data().heatmap; 
+                    if(typeof hmnum !== "number")
+                        hmnum = 0;
+		        	let scale = 255-hmnum/heatmapMax*255;
+		        	tile.css("background-color", "rgb(255, "+scale+", "+scale+")");
+		        }
+		    }
+    	} else {
+            for(let i = 1; i <= height; i++) {
+                for(let j = 1; j <= width; j++) {
+                    let tile = $("#d"+i + "a"+j);
+                    tile.css("background-color", tile.data().gg);
+                }
+            } 
+    	}
+    });
 });
 
 function initialize() {
@@ -37,15 +53,17 @@ function initialize() {
     height = $("#inputHeight").val();
     //scoreTrail = $("#checkboxScore").prop("checked");
     
-    if( width * height > 8192) {
-        alert("Size too big");
-        return;
-    }
+    // if( width * height > 8192) {
+    //     alert("Size too big");
+    //     return;
+    // }
 
     $("#selectSpeed").prop("disabled", true);
     $("#inputWidth").prop("readonly", true);
     $("#inputHeight").prop("readonly", true);
     //$("#checkboxScore").prop("disabled", true);
+    $("#checkboxHeatmap").prop("checked", false);
+    $("#checkboxHeatmap").prop("disabled", true);
     
     $("#buttStart").hide();
     $("#scoreKeep").text("Score: 0");
@@ -55,13 +73,14 @@ function initialize() {
     score = 0;
     snakeList.length = 0;
     directionQueue = ["RIGHT"];
+    heatmapMax = 0;
     
     //makes rows
-    for( var i = 1; i <= height; i++) {
+    for( let i = 1; i <= height; i++) {
         $("#gameBorder").append("<div class='row' id='d"+i+"'></div>");
 
         //makes boxes inside rows
-        for( var j = 1; j <= width; j++) {
+        for( let j = 1; j <= width; j++) {
             $("#d"+i).append("<div class='box' id='d"+i+"a"+j+"'></div>");
         }
     }
@@ -92,42 +111,31 @@ function spawnApple() {
     $("#d"+apple.down + "a"+apple.across).css("background-color", "green");
 }
 
+
 function getBoxColor( coord) {
-    var bgcolor = $("#d"+coord.down + "a"+coord.across).css("background-color")
-    if( bgcolor == "rgb(255, 255, 255)") {
+    var bgcolor = $("#d"+coord.down + "a"+coord.across).css("background-color");
+    if( bgcolor == "rgb(255, 255, 255)")
         return "white";
-    }
-    
-    else if( bgcolor == "rgb(255, 0, 0)") {
+    else if( bgcolor == "rgb(255, 0, 0)")
         return "red";
-    }
-    
-    else if( bgcolor == "rgb(0, 128, 0)") {
+    else if( bgcolor == "rgb(0, 128, 0)")
         return "green";
-    }
-    
-    else {
+    else
         alert("unknown color: " + color);
-    }
 }
 
-function getCollision( head) {
-    if( head.down < 1 || head.down > height || head.across < 1 || head.across > width) {
+// returns a string "border", "snake", or "apple" determining what the head is colliding against 
+function getCollision(head) {
+    if( head.down < 1 || head.down > height || head.across < 1 || head.across > width)
         return "border";
-    }
-
-    else if( getBoxColor( head) == "red") {
+    else if( getBoxColor( head) == "red")
         return "snake";
-    }
-    
-    else if( head.down == apple.down && head.across == apple.across) {
+    else if( head.down == apple.down && head.across == apple.across)
         return "apple";
-    }
-    
-    return "";
+	return "";
 }
 
-function setBoxColor( coord, bgcolor) {
+function setBoxColor(coord, bgcolor) {
     $("#d"+coord.down + "a"+coord.across).css("background-color", bgcolor);
 }
 
@@ -157,48 +165,69 @@ function move() {
     return {across:snakeList[snakeList.length - 1].across + aChange, down:snakeList[snakeList.length - 1].down + dChange};
 }
 
+function updateHeatmap(coord) {
+	var data = $("#d"+coord.down + "a"+coord.across).data();
+	if(data.heatmap == undefined)
+		data.heatmap = 1;
+	else
+		data.heatmap++;
+	if(data.heatmap > heatmapMax)
+		heatmapMax = data.heatmap;
+}
+
 function main() {
     //repellant();
     if( directionQueue.length > 1) {
         directionQueue.shift();
     }
 
-    snakeList.push( move());
-    var theFuture = getCollision( snakeList[snakeList.length - 1]);
-    setBoxColor( snakeList[snakeList.length - 1], "red");
-    
+    var headcoord = move();
+    snakeList.push( headcoord);
+    var theFuture = getCollision( headcoord);
+    setBoxColor( headcoord, "red");
+
     if( theFuture == "apple"){
         updateScore();
         spawnApple();
-    }
-    
-    else if( theFuture == "snake" || theFuture == "border") {
+    } else if( theFuture == "snake" || theFuture == "border") {
         gameOver();
-    }
-    
-    else {
+    } else {
         setBoxColor( snakeList[0], "white");
         snakeList.shift();
     }
+    updateHeatmap( headcoord);
+
+}
+
+function saveBoard() {
+    for(let i = 1; i <= height; i++) {
+        for(let j = 1; j <= width; j++) {
+            let tile = $("#d"+i + "a"+j);
+            tile.data().gg = tile.css("background-color");
+        }
+    } 
 }
 
 function gameOver() {
     clearInterval( interval);
     game = false;
+    saveBoard();
     $("#selectSpeed").prop("disabled", false);
     $("#inputWidth").prop("readonly", false);
     $("#inputHeight").prop("readonly", false);
     
     //$("#checkboxScore").prop("disabled", false);
+    $("#checkboxHeatmap").prop("disabled", false);
     
     $("#buttStart").show().val("Play again").focus();
     //alert("gg");
+    // TODO: save state of board
 }
 
 document.onkeydown = function(e){
     //37-LEFT | 38-UP | 39-RIGHT | 40-DOWN
     if( game) {
-        e.e || window.event
+        // e.e || window.event
         
         var lastEle = directionQueue[directionQueue.length - 1];
 
@@ -218,49 +247,4 @@ document.onkeydown = function(e){
             directionQueue.push( "DOWN");
         }
     }
-}
-
-</script>
-</head>
-
-
-<body>    
-    <div id="leftThing">
-
-        <a href="index.html">Back to main</a>
-        <br/><br/><br/>    
-        <h1>Snakes!</h1>
-        Todo: scaling
-        <br/><br/><br/>    
-
-        Speed: <select id="selectSpeed">
-        <option value=.5>x0.5</option>
-        <option value=1 selected="selected">x1.0</option>
-        <option value=1.5>x1.5</option>
-        <option value=2>x2.0</option>
-        <option value=2.5>x2.5</option>
-        <option value=3>x3.0</option>
-        <option value=3.5>x3.5</option>
-        <option value=4>x4.0</option>        
-    </select><br/>
-    Width: <input id="inputWidth" type="number" value=50 min=30 max=60><br/>
-    Height: <input id="inputHeight" type="number" value=28 min=20 max=50><br/>
-    <input id="checkboxScore" type="checkbox" checked="checked">Toggle score trail<br/>
-    
-    <br/><br/><br/>    
-    <span id="scoreKeep"></span>
-    <br/><br/><br/>
-    
-    <form id="formStartButton">
-        <input id="buttStart" type="submit" value="Start game" autofocus>
-    </form>
-</div>
-
-<div id="rightThing">
-    <div id="gameBorder">
-
-    </div>
-</div>
-
-</body>
-</html>
+};
