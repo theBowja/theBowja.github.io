@@ -25,6 +25,9 @@ svg {
 circle {
   cx: 51;
   cy: 51;
+
+  cx: 51px;
+  cy: 51px;
   stroke: black;
   stroke-width: 1;
 }
@@ -39,14 +42,17 @@ circle {
 
 .shapeS circle  {
   r: 20;
+  r: 20px;
 }
 
 .shapeM circle {
   r: 40;
+  r: 40px;
 }
 
 .shapeL circle {
   r: 80;
+  r: 80px;
 }
 
 .mid .grid {
