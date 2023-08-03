@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<head>
+    <title>Hello!</title>
+    <link rel="stylesheet" type="text/css" href="egg.css">
+    <!-- <script src="../libraries/jquery-1.9.1.min.js"></script> -->
+	<script src="solver.js"></script>
+    <script>
+		let currentPlayer = 1;
+		let selectedP1 = "M";
+		let selectedP2 = "M";
+		let gameNotation = "";
+		let cache = {};
+
+		function handleFirstPlayer() {
+			let tmp = document.querySelector('#firstplayer');
+
+			let asdf = document.querySelector('#playtext');
+			if (tmp.checked) asdf.innerHTML = "I am the first player";
+			else asdf.innerHTML = "I am the second player";
+		};
+
+		function resetGame() {
+			currentPlayer = 1;
+			gameNotation = "";
+			reset();
+
+			for (let i = 1; i <= 9; i++) {
+				document.querySelector(`#board${i}`).innerHTML = '';
+			}
+			updateSuggestions(null);
+		};
+
+		function selectShape(playernum, shape) {
+			if (playernum === 1) {
+				document.querySelector(`#p1${selectedP1}`).classList.remove('selected');
+				selectedP1 = shape;
+				document.querySelector(`#p1${selectedP1}`).classList.add('selected');
+			} else if (playernum === 2) {
+				document.querySelector(`#p2${selectedP2}`).classList.remove('selected');
+				selectedP2 = shape;
+				document.querySelector(`#p2${selectedP2}`).classList.add('selected');
+			}
+		}
+
+		function getShapeSVG(playernum) {
+			return `<svg class="shape${playernum} shape${playernum === 1 ? selectedP1 : selectedP2}"><circle/></svg>`
+		}
+
+		function makeMove(pos) {
+			// check if valid move
+			const valid = isValidMove((currentPlayer === 1 ? selectedP1 : selectedP2) + pos);
+			if (!valid) return;
+
+			// update html
+			document.querySelector(`#board${pos}`).innerHTML = getShapeSVG(currentPlayer);
+
+			let size = currentPlayer === 1 ? selectedP1 : selectedP2;
+
+			// clear suggestions board
+			updateSuggestions(undefined);
+
+			gameNotation = (gameNotation + ' ' + size + pos).trim();
+
+			loadNotation(gameNotation);
+
+			// change players
+			if (currentPlayer === 1) currentPlayer = 2;
+			else currentPlayer = 1;
+			document.querySelector('#currentturn').innerHTML = `CURRENT TURN IS PLAYER ${currentPlayer}`;
+
+			if (cache[gameNotation]) {
+				path = cache[gameNotation];
+			} else if (gameNotation.length > 4) {
+				let result = move(getPlayerTurn(p1, p2), boardSize, boardPlay, path, 1);
+				cache[gameNotation] = JSON.parse(JSON.stringify(path));
+			}
+			updateSuggestions(path);
+		}
+
+		function updateSuggestions(path) {
+			if (!path)
+				document.querySelector('#textsuggestions').innerHTML = '';
+			else
+				document.querySelector('#textsuggestions').innerHTML = JSON.stringify(path, null, '  ');
+		}
+
+    </script>
+</head>
+<body>
+<div class="navbar">
+	<!-- Rounded switch -->
+	<!-- <span id="playtext">I am the first player</span>
+	<label class="switch">
+		<input id="firstplayer" type="checkbox" checked onclick="handleFirstPlayer()">
+		<span class="slider round"></span>
+	</label> -->
+	<br>
+	<button onclick="resetGame()">RESET GAME</button>
+	<br>
+	<br>
+</div>
+
+<div class="bodycolumn left">
+	<div class="grid">
+		<div id="board1" onclick="makeMove('1')"></div>
+		<div id="board2" onclick="makeMove('2')"></div>
+		<div id="board3" onclick="makeMove('3')"></div>
+		<div id="board4" onclick="makeMove('4')"></div>
+		<div id="board5" onclick="makeMove('5')"></div>
+		<div id="board6" onclick="makeMove('6')"></div>
+		<div id="board7" onclick="makeMove('7')"></div>
+		<div id="board8" onclick="makeMove('8')"></div>
+		<div id="board9" onclick="makeMove('9')"></div>  
+	</div>
+</div>
+<div class="bodycolumn mid">
+	<div>
+		<span id="currentturn">CURRENT TURN IS PLAYER 1</span>
+		<div class="grid">
+			<div id="p1S" onclick="selectShape(1, 'S')">​
+				<svg class="shape1 shapeS"><circle/></svg>
+			</div>
+			<div id="p1M" onclick="selectShape(1, 'M')" class="selected">
+				<svg class="shape1 shapeM"><circle/></svg>
+			</div>
+			<div id="p1L" onclick="selectShape(1, 'L')">
+				<svg class="shape1 shapeL"><circle/></svg>
+			</div>
+			<div id="p2S" onclick="selectShape(2, 'S')">
+				<svg class="shape2 shapeS"><circle/></svg>
+			</div>
+			<div id="p2M" onclick="selectShape(2, 'M')" class="selected">
+				<svg class="shape2 shapeM"><circle/></svg>
+			</div>
+			<div id="p2L" onclick="selectShape(2, 'L')">
+				<svg class="shape2 shapeL"><circle/></svg>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="bodycolumn right">
+	<textarea id="textsuggestions"></textarea>
+	<!-- <div class="grid">
+		<div id="g1">​</div>
+		<div id="g2"></div>
+		<div id="g3"></div>
+		<div id="g4"></div>
+		<div id="g5"></div>
+		<div id="g6"></div>
+		<div id="g7"></div>
+		<div id="g8"></div>
+		<div id="g9"></div>
+	</div> -->
+</div>
+
+</body>
